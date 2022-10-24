@@ -5,7 +5,6 @@
 
 typedef double Value;
 
-
 typedef struct {
   int capacity;
   int count;

@@ -5,9 +5,14 @@
 
 VM vm;
 
-void initVM(){
-
+static void resetStack(){
+  vm.stackTop = vm.stack;
 }
+
+void initVM(){
+  resetStack();
+}
+
 
 static InterpretResult run(){
 #define READ_BYTE() (*vm.ip++)
@@ -40,6 +45,16 @@ InterpretResult interpret(Chunk *chunk){
   vm.chunk = chunk;
   vm.ip = vm.chunk->code;
   return run();
+}
+
+void push(Value value){
+  *vm.stack = value;
+  vm.stackTop++;
+}
+
+Value pop(){
+  vm.stackTop--;
+  return *vm.stack;
 }
 
 void freeVM(){

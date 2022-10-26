@@ -13,7 +13,6 @@ void initVM(){
   resetStack();
 }
 
-
 static InterpretResult run(){
 #define READ_BYTE() (*vm.ip++)
 #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
@@ -36,13 +35,16 @@ static InterpretResult run(){
           Value constant = READ_CONSTANT();
           push(constant);
           break;
-
         }
       case OP_RETURN: {
          printValue(pop());
          printf("\n");
          return INTERPRET_OK;
-       }
+        }
+      case OP_NEGATE: {
+          push(-pop());
+          break;
+        }
     }
   }
 

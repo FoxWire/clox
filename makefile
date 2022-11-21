@@ -3,7 +3,7 @@ SOURCES_NO_MAIN = $(filter-out src/main.c, $(SOURCES_ALL))
 	# remove main.c for unit tests, minunit must already use main
 OBJECTS_ALL = $(patsubst %.c,%.o,$(SOURCES_ALL)) # all the .o files
 
-TEST_SOURCES = $(wildcard tests/*_tests.c)
+TEST_SOURCES = $(wildcard test/*_test.c)
 TEST_TARGETS = $(patsubst %.c,%,$(TEST_SOURCES))
 
 # Any changes in any header should also trigger recompilation. The rule says that .o files depend on their .c files and all headers.
@@ -22,12 +22,12 @@ $(TEST_TARGETS): %: %.c $(SOURCES_NO_MAIN) $(HEADERS)
 # 
 .PHONY: test
 test: $(TEST_TARGETS)
-	sh ./tests/runtests.sh
+	sh ./test/runtests.sh
 
 .PHONY: clean
 clean:
-	rm -f tests/tests.log 
-	rm -f tests/*_tests
+	rm -f test/test.log 
+	rm -f test/*_test
 	rm -f src/*.o
 	rm -f bin/*
 

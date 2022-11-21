@@ -64,7 +64,7 @@ static void skipWhiteSpace(){
 
 
 Token scanToken(){
-  printf("$$$$$$$$$$$$\n");
+  // hello
   skipWhiteSpace();
 
   scanner.start = scanner.current;

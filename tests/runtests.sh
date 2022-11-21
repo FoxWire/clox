@@ -1,4 +1,5 @@
 echo "RUNNING UNIT TESTS"
+echo ""
 
 for i in tests/*_tests
 do 
@@ -6,7 +7,8 @@ do
 	then 
 		if $VALGRIND ./$i 2>> tests/tests.log
 		then 
-			echo $i PASS
+			# echo $i PASS
+			echo ""
 		else
 			echo "ERROR in test $i: here's tests/qtests.log"
 			echo "----"

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include "dbg.h"
 
 #include "common.h"
 #include "scanner.h"
@@ -50,15 +51,28 @@ static bool match(char expected){
   if (*scanner.current != expected) return false;
   scanner.current++;
   return true;
-
 }
 
+static void skipWhiteSpace(){
+  char current = *scanner.current;
+  while( current == ' '
+      || current == '\t'
+      || current == '\r'){
+    current = advance();
+  }
+}
+
+
 Token scanToken(){
+  printf("$$$$$$$$$$$$\n");
+  skipWhiteSpace();
+
   scanner.start = scanner.current;
 
   if (isAtEnd()){
     return makeToken(TOKEN_EOF);
   }
+
 
  char c = advance();
 
@@ -74,10 +88,10 @@ Token scanToken(){
     case '+': return makeToken(TOKEN_PLUS);
     case '/': return makeToken(TOKEN_SLASH);
     case '*': return makeToken(TOKEN_STAR);
-    case '!': return makeToken(match("=") ? TOKEN_BANG_EQUAL: TOKEN_BANG);
-    case '=': return makeToken(match("=") ? TOKEN_EQUAL_EQUAL: TOKEN_EQUAL);
-    case '<': return makeToken(match("=") ? TOKEN_LESS_EQUAL: TOKEN_LESS);
-    case '>': return makeToken(match("=") ? TOKEN_GREATER_EQUAL: TOKEN_GREATER);
+    case '!': return makeToken(match('=') ? TOKEN_BANG_EQUAL: TOKEN_BANG);
+    case '=': return makeToken(match('=') ? TOKEN_EQUAL_EQUAL: TOKEN_EQUAL);
+    case '<': return makeToken(match('=') ? TOKEN_LESS_EQUAL: TOKEN_LESS);
+    case '>': return makeToken(match('=') ? TOKEN_GREATER_EQUAL: TOKEN_GREATER);
   }
 
   return errorToken("Unexpected character");

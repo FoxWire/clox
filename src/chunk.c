@@ -37,6 +37,10 @@ void freeChunk(Chunk *chunk){
   initChunk(chunk);
 }
 
+int addition(int a, int b){
+  return a + b;
+}
+
 
 
 

@@ -58,6 +58,8 @@ static void runFile(const char *path){
 
 int main(int argc, const char *argv[]){
 
+  printf("hello there");
+
   initVM();
 
   if (argc == 1){

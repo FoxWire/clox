@@ -13,7 +13,7 @@ typedef struct {
 
 Scanner scanner;
 
-void initScanner(const char *source){
+void init_scanner(const char *source){
   scanner.start = source;
   scanner.current = source;
   scanner.line = 1;
@@ -57,17 +57,17 @@ static bool match(char expected){
   return true;
 }
 
-static bool isWhiteSpace(const char character){
+static bool is_whitespace(const char character){
   return (character == ' '
       || character == '\t'
       || character == '\r'
       || character == '\n');
 }
 
-static void skipWhiteSpace(){
+static void skip_whitespace(){
 
   char current = *scanner.current;
-  while (isWhiteSpace(current)){
+  while (is_whitespace(current)){
     if (current == '\n'){
       scanner.line++;
     }
@@ -75,8 +75,21 @@ static void skipWhiteSpace(){
   }
 }
 
-Token scanToken(){
-  skipWhiteSpace();
+static void skip_comments(){
+
+  if (scanner.current[0] == '/'
+      && scanner.current[1] == '/'){
+    while (*scanner.current != '\n'){
+      scanner.current++;
+    }
+    scanner.current++; // consume newline
+  }
+}
+
+Token scan_token(){
+
+  skip_whitespace();
+  skip_comments();
 
   scanner.start = scanner.current;
 

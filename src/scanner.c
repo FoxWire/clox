@@ -46,6 +46,10 @@ char advance(){
   return scanner.current[-1];
 }
 
+static char peek(){
+  return *scanner.current;
+}
+
 static bool match(char expected){
   if (isAtEnd()) return false;
   if (*scanner.current != expected) return false;
@@ -53,18 +57,25 @@ static bool match(char expected){
   return true;
 }
 
+static bool isWhiteSpace(const char character){
+  return (character == ' '
+      || character == '\t'
+      || character == '\r'
+      || character == '\n');
+}
+
 static void skipWhiteSpace(){
+
   char current = *scanner.current;
-  while( current == ' '
-      || current == '\t'
-      || current == '\r'){
-    current = advance();
+  while (isWhiteSpace(current)){
+    if (current == '\n'){
+      scanner.line++;
+    }
+    current = *++scanner.current;
   }
 }
 
-
 Token scanToken(){
-  // hello
   skipWhiteSpace();
 
   scanner.start = scanner.current;

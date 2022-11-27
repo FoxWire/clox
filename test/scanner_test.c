@@ -39,7 +39,6 @@ char *single_slashes_are_not_treated_as_comments(){
 
   Token second_token = scan_token();
   mu_assert(second_token.type == TOKEN_SLASH, "should be slash");
-
   Token third_token = scan_token();
   mu_assert(third_token.type == TOKEN_BANG, "should be bang");
 
@@ -60,6 +59,29 @@ char *comments_cause_rest_of_line_to_be_ignored(){
   return NULL;
 }
 
+char *string_literals_are_parsed(){
+
+  init_scanner("(\"Hello, world!\")");
+
+  Token first_token = scan_token();
+  mu_assert(first_token.type == TOKEN_LEFT_PAREN, "should be left paren");
+
+  Token second_token = scan_token();
+  mu_assert(second_token.type == TOKEN_STRING, "");
+
+  char *dest = malloc(second_token.length + 1);
+  memcpy(dest, second_token.start, second_token.length);
+  dest[second_token.length] = '\0';
+
+  mu_assert_str(dest, "Hello, world!", "message");
+
+  Token third_token = scan_token();
+  mu_assert(third_token.type == TOKEN_RIGHT_PAREN, "expecting right paren");
+
+  free(dest);
+
+  return NULL;
+}
 
 char *all_tests()
 {
@@ -69,6 +91,7 @@ char *all_tests()
   mu_run_test(newline_in_whitespace_increases_line_count);
   mu_run_test(single_slashes_are_not_treated_as_comments);
   mu_run_test(comments_cause_rest_of_line_to_be_ignored);
+  mu_run_test(string_literals_are_parsed);
 
   return NULL;
 }

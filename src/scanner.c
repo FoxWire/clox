@@ -86,10 +86,27 @@ static void skip_comments(){
   }
 }
 
+Token makeStringToken(){
+
+  const char *start_string = scanner.current;
+  while (*scanner.current != '\"'){
+    scanner.current++;
+  }
+  const char *end_string = scanner.current;
+  scanner.current++; // bump one to remove '"'
+
+  Token token;
+  token.type = TOKEN_STRING;
+  token.start = start_string;
+  token.length = (int) (end_string - start_string);
+  token.line = scanner.line;
+  return token;
+}
+
 Token scan_token(){
 
-  skip_whitespace();
-  skip_comments();
+  skip_whitespace(); 
+  skip_comments(); // might be better if this were in the switch.
 
   scanner.start = scanner.current;
 
@@ -97,10 +114,10 @@ Token scan_token(){
     return makeToken(TOKEN_EOF);
   }
 
-
  char c = advance();
 
   switch (c) {
+    case '\"': return makeStringToken();
     case '(': return makeToken(TOKEN_LEFT_PAREN);
     case ')': return makeToken(TOKEN_RIGHT_PAREN);
     case '{': return makeToken(TOKEN_LEFT_BRACE);
@@ -119,7 +136,4 @@ Token scan_token(){
   }
 
   return errorToken("Unexpected character");
-
-
-
 }

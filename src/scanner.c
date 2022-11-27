@@ -113,7 +113,7 @@ Token makeStringToken(){
 Token scan_token(){
 
   skip_whitespace(); 
-  skip_comments(); // might be better if this were in the switch.
+  skip_comments(); 
 
   scanner.start = scanner.current;
 

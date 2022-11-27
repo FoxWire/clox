@@ -36,7 +36,7 @@ static Token errorToken(const char *message){
   Token token;
   token.type = TOKEN_ERROR;
   token.start = message;
-  token.length = (int)strlen(message);
+  token.length = (int) strlen(message);
   token.line = scanner.line;
   return token;
 }
@@ -90,6 +90,13 @@ Token makeStringToken(){
 
   const char *start_string = scanner.current;
   while (*scanner.current != '\"'){
+    if (isAtEnd()){
+      return errorToken("Unterminated string");
+    }
+    if (*scanner.current == '\n'){
+      scanner.line++;
+    }
+
     scanner.current++;
   }
   const char *end_string = scanner.current;

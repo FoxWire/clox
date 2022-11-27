@@ -83,6 +83,35 @@ char *string_literals_are_parsed(){
   return NULL;
 }
 
+char *hitting_eof_before_termining_string_gives_unterminated_string_error(){
+
+  init_scanner("\"Hello, world!"); 
+
+  Token token = scan_token();
+  mu_assert(token.type == TOKEN_ERROR, "expecting error token");
+
+  char *dest = malloc(token.length + 1);
+  memcpy(dest, token.start, token.length);
+  dest[token.length] = '\0';
+
+  mu_assert_str(dest, "Unterminated string", "");
+
+  free(dest);
+
+  return NULL;
+}
+
+char *newlines_in_string_literals_increase_line_count(){
+
+  init_scanner("\"Hello, \nworld!:\""); 
+
+  Token token = scan_token();
+  mu_assert(token.type == TOKEN_STRING, "");
+  mu_assert(token.line == 2, "");
+
+  return NULL;
+}
+
 char *all_tests()
 {
   mu_suite_start();
@@ -92,6 +121,8 @@ char *all_tests()
   mu_run_test(single_slashes_are_not_treated_as_comments);
   mu_run_test(comments_cause_rest_of_line_to_be_ignored);
   mu_run_test(string_literals_are_parsed);
+  mu_run_test(hitting_eof_before_termining_string_gives_unterminated_string_error);
+  mu_run_test(newlines_in_string_literals_increase_line_count);
 
   return NULL;
 }

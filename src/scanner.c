@@ -23,7 +23,7 @@ static bool isAtEnd(){
   return *scanner.current == '\0';
 }
 
-static Token makeToken(TokenType type){
+static Token make_token(TokenType type){
   Token token;
   token.type = type;
   token.start = scanner.current;
@@ -32,7 +32,7 @@ static Token makeToken(TokenType type){
   return token;
 }
 
-static Token errorToken(const char *message){
+static Token make_error_token(const char *message){
   Token token;
   token.type = TOKEN_ERROR;
   token.start = message;
@@ -86,12 +86,12 @@ static void skip_comments(){
   }
 }
 
-Token makeStringToken(){
+static Token make_string_token(){
 
   const char *start_string = scanner.current;
   while (*scanner.current != '\"'){
     if (isAtEnd()){
-      return errorToken("Unterminated string");
+      return make_error_token("Unterminated string");
     }
     if (*scanner.current == '\n'){
       scanner.line++;
@@ -110,37 +110,66 @@ Token makeStringToken(){
   return token;
 }
 
+static bool is_numeric(char character){
+  return (character >= '0' && character <= '9');
+}
+
+static Token make_number_token(){
+
+  while (is_numeric(*scanner.current)){
+    scanner.current++;
+  }
+
+  if (*scanner.current == '.'){
+    scanner.current++;
+    while (is_numeric(*scanner.current)){
+      scanner.current++;
+    }
+  }
+
+  Token token;
+  token.type = TOKEN_NUMBER;
+  token.start = scanner.start; 
+  token.length = (int) (scanner.current - scanner.start);
+  token.line = scanner.line;
+  return token;
+}
+
 Token scan_token(){
 
   skip_whitespace(); 
   skip_comments(); 
 
+  if (isAtEnd()){
+    return make_token(TOKEN_EOF);
+  }
+
   scanner.start = scanner.current;
 
-  if (isAtEnd()){
-    return makeToken(TOKEN_EOF);
+ char next_char = advance();
+
+ if (is_numeric(next_char)){
+   return make_number_token();
+ }
+
+  switch (next_char) {
+    case '\"': return make_string_token();
+    case '(': return make_token(TOKEN_LEFT_PAREN);
+    case ')': return make_token(TOKEN_RIGHT_PAREN);
+    case '{': return make_token(TOKEN_LEFT_BRACE);
+    case '}': return make_token(TOKEN_RIGHT_BRACE);
+    case ';': return make_token(TOKEN_SEMICOLON);
+    case ',': return make_token(TOKEN_COMMA);
+    case '.': return make_token(TOKEN_DOT);
+    case '-': return make_token(TOKEN_MINUS);
+    case '+': return make_token(TOKEN_PLUS);
+    case '/': return make_token(TOKEN_SLASH);
+    case '*': return make_token(TOKEN_STAR);
+    case '!': return make_token(match('=') ? TOKEN_BANG_EQUAL: TOKEN_BANG);
+    case '=': return make_token(match('=') ? TOKEN_EQUAL_EQUAL: TOKEN_EQUAL);
+    case '<': return make_token(match('=') ? TOKEN_LESS_EQUAL: TOKEN_LESS);
+    case '>': return make_token(match('=') ? TOKEN_GREATER_EQUAL: TOKEN_GREATER);
   }
 
- char c = advance();
-
-  switch (c) {
-    case '\"': return makeStringToken();
-    case '(': return makeToken(TOKEN_LEFT_PAREN);
-    case ')': return makeToken(TOKEN_RIGHT_PAREN);
-    case '{': return makeToken(TOKEN_LEFT_BRACE);
-    case '}': return makeToken(TOKEN_RIGHT_BRACE);
-    case ';': return makeToken(TOKEN_SEMICOLON);
-    case ',': return makeToken(TOKEN_COMMA);
-    case '.': return makeToken(TOKEN_DOT);
-    case '-': return makeToken(TOKEN_MINUS);
-    case '+': return makeToken(TOKEN_PLUS);
-    case '/': return makeToken(TOKEN_SLASH);
-    case '*': return makeToken(TOKEN_STAR);
-    case '!': return makeToken(match('=') ? TOKEN_BANG_EQUAL: TOKEN_BANG);
-    case '=': return makeToken(match('=') ? TOKEN_EQUAL_EQUAL: TOKEN_EQUAL);
-    case '<': return makeToken(match('=') ? TOKEN_LESS_EQUAL: TOKEN_LESS);
-    case '>': return makeToken(match('=') ? TOKEN_GREATER_EQUAL: TOKEN_GREATER);
-  }
-
-  return errorToken("Unexpected character");
+  return make_error_token("Unexpected character");
 }

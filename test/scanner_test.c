@@ -74,15 +74,14 @@ char *string_literals_are_parsed(){
   Token second_token = scan_token();
   mu_assert(second_token.type == TOKEN_STRING, "");
 
-  char *dest = extract_string(second_token);
+  char *token_string = extract_string(second_token);
 
-  mu_assert_str(dest, "Hello, world!", "message");
+  mu_assert_str(token_string, "Hello, world!", "message");
 
   Token third_token = scan_token();
   mu_assert(third_token.type == TOKEN_RIGHT_PAREN, "expecting right paren");
 
-  free(dest);
-
+  free(token_string);
   return NULL;
 }
 
@@ -98,7 +97,6 @@ char *hitting_eof_before_termining_string_gives_unterminated_string_error(){
   mu_assert_str(token_string, "Unterminated string", "");
 
   free(token_string);
-
   return NULL;
 }
 
@@ -128,6 +126,7 @@ char *integers_are_scanned(){
   Token third = scan_token();
   mu_assert(third.type == TOKEN_RIGHT_PAREN, "expecting right paren");
 
+  free(token_string);
   return NULL;
 }
 
@@ -165,6 +164,74 @@ char *trailing_doubles_are_scanned(){
   return NULL;
 }
 
+char *identifiers_are_scanned(){
+
+  init_scanner("my_variable123");
+
+  Token token = scan_token();
+  mu_assert(token.type == TOKEN_IDENTIFIER, "expecting identifier");
+  char *token_string = extract_string(token);
+  mu_assert_str(token_string, "my_variable123", "expecting 'my_variable123'");
+
+  free(token_string);
+  return NULL;
+}
+
+char *keywords_are_scanned(){
+
+  init_scanner("and class else if nil or print return super var while false for fun this true");
+
+  Token token = scan_token();
+  mu_assert(token.type == TOKEN_AND, "expecting and");
+
+  token = scan_token();
+  mu_assert(token.type == TOKEN_CLASS, "expecting class");
+
+  token = scan_token();
+  mu_assert(token.type == TOKEN_ELSE, "expecting else");
+
+  token = scan_token();
+  mu_assert(token.type == TOKEN_IF, "expecting if");
+
+  token = scan_token();
+  mu_assert(token.type == TOKEN_NIL, "expecting nil");
+
+  token = scan_token();
+  mu_assert(token.type == TOKEN_OR, "expecting or");
+
+  token = scan_token();
+  mu_assert(token.type == TOKEN_PRINT, "expecting print");
+
+  token = scan_token();
+  mu_assert(token.type == TOKEN_RETURN, "expecting return");
+
+  token = scan_token();
+  mu_assert(token.type == TOKEN_SUPER, "expecting super");
+
+  token = scan_token();
+  mu_assert(token.type == TOKEN_VAR, "expecting var");
+
+  token = scan_token();
+  mu_assert(token.type == TOKEN_WHILE, "expecting while");
+
+  token = scan_token();
+  mu_assert(token.type == TOKEN_FALSE, "expecting false");
+
+  token = scan_token();
+  mu_assert(token.type == TOKEN_FOR, "expecting for");
+
+  token = scan_token();
+  mu_assert(token.type == TOKEN_FUN, "expecting fun");
+
+  token = scan_token();
+  mu_assert(token.type == TOKEN_THIS, "expecting this");
+
+  token = scan_token();
+  mu_assert(token.type == TOKEN_TRUE, "expecting true");
+
+  return NULL;
+}
+
 char *all_tests() {
 
   mu_suite_start();
@@ -179,6 +246,8 @@ char *all_tests() {
   mu_run_test(integers_are_scanned);
   mu_run_test(doubles_are_scanned);
   mu_run_test(trailing_doubles_are_scanned);
+  mu_run_test(identifiers_are_scanned);
+  // mu_run_test(keywords_are_scanned);
 
   return NULL;
 }

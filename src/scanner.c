@@ -135,6 +135,28 @@ static Token make_number_token(){
   return token;
 }
 
+static bool is_alpha(char character){
+  return (character >= 'a' && character <= 'z'
+      || character >= 'A' && character <= 'Z');
+}
+
+static Token make_keyword_or_identifier(){
+  while (is_alpha(*scanner.current) 
+      || is_numeric(*scanner.current) 
+      || *scanner.current == '_'){
+    scanner.current++;
+  }
+
+  Token token;
+  token.type = TOKEN_IDENTIFIER;
+  token.start = scanner.start; 
+  token.length = (int) (scanner.current - scanner.start);
+  token.line = scanner.line;
+  return token;
+}
+
+
+// Main entry point
 Token scan_token(){
 
   skip_whitespace(); 
@@ -150,6 +172,10 @@ Token scan_token(){
 
  if (is_numeric(next_char)){
    return make_number_token();
+ }
+
+ if (is_alpha(next_char)){
+   return make_keyword_or_identifier();
  }
 
   switch (next_char) {

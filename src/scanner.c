@@ -4,6 +4,7 @@
 
 #include "common.h"
 #include "scanner.h"
+#include "scanner_utils.c"
 
 typedef struct {
   const char *start;
@@ -57,13 +58,6 @@ static bool match(char expected){
   return true;
 }
 
-static bool is_whitespace(const char character){
-  return (character == ' '
-      || character == '\t'
-      || character == '\r'
-      || character == '\n');
-}
-
 static void skip_whitespace(){
 
   char current = *scanner.current;
@@ -110,10 +104,6 @@ static Token make_string_token(){
   return token;
 }
 
-static bool is_numeric(char character){
-  return (character >= '0' && character <= '9');
-}
-
 static Token make_number_token(){
 
   while (is_numeric(*scanner.current)){
@@ -133,11 +123,6 @@ static Token make_number_token(){
   token.length = (int) (scanner.current - scanner.start);
   token.line = scanner.line;
   return token;
-}
-
-static bool is_alpha(char character){
-  return (character >= 'a' && character <= 'z'
-      || character >= 'A' && character <= 'Z');
 }
 
 static Token make_keyword_or_identifier(){
@@ -168,15 +153,15 @@ Token scan_token(){
 
   scanner.start = scanner.current;
 
- char next_char = advance();
+  char next_char = advance();
 
- if (is_numeric(next_char)){
-   return make_number_token();
- }
+  if (is_numeric(next_char)){
+    return make_number_token();
+  }
 
- if (is_alpha(next_char)){
-   return make_keyword_or_identifier();
- }
+  if (is_alpha(next_char)){
+    return make_keyword_or_identifier();
+  }
 
   switch (next_char) {
     case '\"': return make_string_token();

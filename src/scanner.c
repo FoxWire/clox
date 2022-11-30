@@ -27,7 +27,7 @@ static bool isAtEnd(){
 static Token make_token(TokenType type){
   Token token;
   token.type = type;
-  token.start = scanner.current;
+  token.start = scanner.start;
   token.length = (int) (scanner.current - scanner.start);
   token.line = scanner.line;
   return token;
@@ -117,12 +117,7 @@ static Token make_number_token(){
     }
   }
 
-  Token token;
-  token.type = TOKEN_NUMBER;
-  token.start = scanner.start; 
-  token.length = (int) (scanner.current - scanner.start);
-  token.line = scanner.line;
-  return token;
+  return make_token(TOKEN_NUMBER);
 }
 
 static Token make_keyword_or_identifier(){
@@ -132,16 +127,11 @@ static Token make_keyword_or_identifier(){
     scanner.current++;
   }
 
-  Token token;
-  token.type = TOKEN_IDENTIFIER;
-  token.start = scanner.start; 
-  token.length = (int) (scanner.current - scanner.start);
-  token.line = scanner.line;
-  return token;
+  return make_token(TOKEN_IDENTIFIER);
 }
 
 
-// Main entry point
+// MAIN ENTRY POINT //
 Token scan_token(){
 
   skip_whitespace(); 

@@ -177,7 +177,7 @@ char *identifiers_are_scanned(){
   return NULL;
 }
 
-char *keywords_are_scanned(){
+char *all_keywords_are_scanned(){
 
   init_scanner("and class else if nil or print return super var while false for fun this true");
 
@@ -232,6 +232,36 @@ char *keywords_are_scanned(){
   return NULL;
 }
 
+char *keywords_are_scanned(){
+
+  init_scanner("and");
+
+  Token token = scan_token();
+  mu_assert(token.type == TOKEN_AND, "expecting and");
+
+  return NULL;
+}
+
+char *keywords_are_filtered_on_length(){
+
+  init_scanner("ardvark");
+
+  Token token = scan_token();
+  mu_assert(token.type != TOKEN_AND, "expecting identifier");
+
+  return NULL;
+}
+
+char *keywords_are_filtered_on_content(){
+
+  init_scanner("are");
+
+  Token token = scan_token();
+  mu_assert(token.type != TOKEN_AND, "expecting identifier");
+
+  return NULL;
+}
+
 char *all_tests() {
 
   mu_suite_start();
@@ -247,7 +277,9 @@ char *all_tests() {
   mu_run_test(doubles_are_scanned);
   mu_run_test(trailing_doubles_are_scanned);
   mu_run_test(identifiers_are_scanned);
-  // mu_run_test(keywords_are_scanned);
+  mu_run_test(keywords_are_scanned);
+  mu_run_test(keywords_are_filtered_on_length);
+  mu_run_test(keywords_are_filtered_on_content);
 
   return NULL;
 }

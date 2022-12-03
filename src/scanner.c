@@ -120,6 +120,29 @@ static Token make_number_token(){
   return make_token(TOKEN_NUMBER);
 }
 
+
+static TokenType match_token(const int length_of_rest, char *rest, TokenType type){
+
+  const char *index_last_char = scanner.current - 1;
+  if (index_last_char - scanner.start == length_of_rest
+      && memcmp(scanner.start + 1, rest, length_of_rest) == 0) {
+    return type;
+  }
+
+  return TOKEN_IDENTIFIER;
+}
+
+static TokenType get_token_type(){
+
+  char start_char = *scanner.start;
+
+  switch(start_char){
+    case 'a': return match_token(2, "nd", TOKEN_AND);
+  }
+
+  return TOKEN_IDENTIFIER;
+}
+
 static Token make_keyword_or_identifier(){
   while (is_alpha(*scanner.current) 
       || is_numeric(*scanner.current) 
@@ -127,7 +150,7 @@ static Token make_keyword_or_identifier(){
     scanner.current++;
   }
 
-  return make_token(TOKEN_IDENTIFIER);
+  return make_token(get_token_type());
 }
 
 

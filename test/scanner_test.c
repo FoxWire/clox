@@ -291,7 +291,7 @@ char *all_tests() {
   mu_run_test(keywords_are_filtered_on_content);
 
   mu_run_test(single_branch_keywords_are_scanned);
-  //mu_run_test(multiple_branch_keywords_are_scanned);
+  mu_run_test(multiple_branch_keywords_are_scanned);
 
   return NULL;
 }

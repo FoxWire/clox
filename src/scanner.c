@@ -121,11 +121,16 @@ static Token make_number_token(){
 }
 
 
-static TokenType match_token_type(const int length_of_rest, char *rest, TokenType type){
+// [a n d]
+// [0 1 2]
+//        curr/3
 
-  const char *index_last_char = scanner.current - 1;
-  if (index_last_char - scanner.start == length_of_rest
-      && memcmp(scanner.start + 1, rest, length_of_rest) == 0) {
+static TokenType match_token_type(const int start_offset, const int length_of_rest, char *rest, TokenType type){
+
+  long calc_length = scanner.current - (scanner.start + start_offset);
+
+  if (calc_length == length_of_rest
+      && memcmp(scanner.start + start_offset, rest, length_of_rest) == 0) {
     return type;
   }
 
@@ -138,17 +143,28 @@ static TokenType get_token_type(){
   //init_scanner("and class else if nil or print return super var while false for fun this true");
 
   switch(start_char){
-    case 'a': return match_token_type(2, "nd", TOKEN_AND);
-    case 'c': return match_token_type(4, "lass", TOKEN_CLASS);
-    case 'e': return match_token_type(3, "lse", TOKEN_ELSE);
-    case 'i': return match_token_type(1, "f", TOKEN_IF);
-    case 'n': return match_token_type(2, "il", TOKEN_NIL);
-    case 'o': return match_token_type(1, "r", TOKEN_OR);
-    case 'p': return match_token_type(4, "rint", TOKEN_PRINT);
-    case 'r': return match_token_type(5, "eturn", TOKEN_RETURN);
-    case 's': return match_token_type(4, "uper", TOKEN_SUPER);
-    case 'v': return match_token_type(2, "ar", TOKEN_VAR);
-    case 'w': return match_token_type(4, "hile", TOKEN_WHILE);
+    case 'a': return match_token_type(1, 2, "nd", TOKEN_AND);
+    case 'c': return match_token_type(1, 4, "lass", TOKEN_CLASS);
+    case 'e': return match_token_type(1, 3, "lse", TOKEN_ELSE);
+    case 'i': return match_token_type(1, 1, "f", TOKEN_IF);
+    case 'n': return match_token_type(1, 2, "il", TOKEN_NIL);
+    case 'o': return match_token_type(1, 1, "r", TOKEN_OR);
+    case 'p': return match_token_type(1, 4, "rint", TOKEN_PRINT);
+    case 'r': return match_token_type(1, 5, "eturn", TOKEN_RETURN);
+    case 's': return match_token_type(1, 4, "uper", TOKEN_SUPER);
+    case 'v': return match_token_type(1, 2, "ar", TOKEN_VAR);
+    case 'w': return match_token_type(1, 4, "hile", TOKEN_WHILE);
+    case 'f': 
+              switch (*scanner.start + 1){
+                case 'a': return match_token_type(2, 3, "lse", TOKEN_FALSE);
+                case 'o': return match_token_type(2, 1, "r", TOKEN_FOR);
+                case 'u': return match_token_type(2, 1, "n", TOKEN_FUN);
+              }
+    case 't':
+              switch (*scanner.start + 1){
+                case 'h': return match_token_type(2, 2, "is", TOKEN_THIS);
+                case 'r': return match_token_type(2, 2, "ue", TOKEN_TRUE);
+              }
   }
 
   return TOKEN_IDENTIFIER;

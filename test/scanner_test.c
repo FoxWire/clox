@@ -177,9 +177,39 @@ char *identifiers_are_scanned(){
   return NULL;
 }
 
-char *all_keywords_are_scanned(){
+char *keywords_are_scanned(){
 
-  init_scanner("and class else if nil or print return super var while false for fun this true");
+  init_scanner("and");
+
+  Token token = scan_token();
+  mu_assert(token.type == TOKEN_AND, "expecting and");
+
+  return NULL;
+}
+
+char *keywords_are_filtered_on_length(){
+
+  init_scanner("ardvark");
+
+  Token token = scan_token();
+  mu_assert(token.type != TOKEN_AND, "expecting identifier");
+
+  return NULL;
+}
+
+char *keywords_are_filtered_on_content(){
+
+  init_scanner("are");
+
+  Token token = scan_token();
+  mu_assert(token.type != TOKEN_AND, "expecting identifier");
+
+  return NULL;
+}
+
+char *single_branch_keywords_are_scanned(){
+
+  init_scanner("and class else if nil or print return super var while");
 
   Token token = scan_token();
   mu_assert(token.type == TOKEN_AND, "expecting and");
@@ -214,7 +244,14 @@ char *all_keywords_are_scanned(){
   token = scan_token();
   mu_assert(token.type == TOKEN_WHILE, "expecting while");
 
-  token = scan_token();
+  return NULL;
+}
+
+char *multiple_branch_keywords_are_scanned(){
+
+  init_scanner("while false for fun this true");
+
+  Token token = scan_token();
   mu_assert(token.type == TOKEN_FALSE, "expecting false");
 
   token = scan_token();
@@ -232,35 +269,6 @@ char *all_keywords_are_scanned(){
   return NULL;
 }
 
-char *keywords_are_scanned(){
-
-  init_scanner("and");
-
-  Token token = scan_token();
-  mu_assert(token.type == TOKEN_AND, "expecting and");
-
-  return NULL;
-}
-
-char *keywords_are_filtered_on_length(){
-
-  init_scanner("ardvark");
-
-  Token token = scan_token();
-  mu_assert(token.type != TOKEN_AND, "expecting identifier");
-
-  return NULL;
-}
-
-char *keywords_are_filtered_on_content(){
-
-  init_scanner("are");
-
-  Token token = scan_token();
-  mu_assert(token.type != TOKEN_AND, "expecting identifier");
-
-  return NULL;
-}
 
 char *all_tests() {
 
@@ -276,10 +284,14 @@ char *all_tests() {
   mu_run_test(integers_are_scanned);
   mu_run_test(doubles_are_scanned);
   mu_run_test(trailing_doubles_are_scanned);
+
   mu_run_test(identifiers_are_scanned);
   mu_run_test(keywords_are_scanned);
   mu_run_test(keywords_are_filtered_on_length);
   mu_run_test(keywords_are_filtered_on_content);
+
+  mu_run_test(single_branch_keywords_are_scanned);
+  //mu_run_test(multiple_branch_keywords_are_scanned);
 
   return NULL;
 }

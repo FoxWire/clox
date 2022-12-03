@@ -121,7 +121,7 @@ static Token make_number_token(){
 }
 
 
-static TokenType match_token(const int length_of_rest, char *rest, TokenType type){
+static TokenType match_token_type(const int length_of_rest, char *rest, TokenType type){
 
   const char *index_last_char = scanner.current - 1;
   if (index_last_char - scanner.start == length_of_rest
@@ -135,9 +135,20 @@ static TokenType match_token(const int length_of_rest, char *rest, TokenType typ
 static TokenType get_token_type(){
 
   char start_char = *scanner.start;
+  //init_scanner("and class else if nil or print return super var while false for fun this true");
 
   switch(start_char){
-    case 'a': return match_token(2, "nd", TOKEN_AND);
+    case 'a': return match_token_type(2, "nd", TOKEN_AND);
+    case 'c': return match_token_type(4, "lass", TOKEN_CLASS);
+    case 'e': return match_token_type(3, "lse", TOKEN_ELSE);
+    case 'i': return match_token_type(1, "f", TOKEN_IF);
+    case 'n': return match_token_type(2, "il", TOKEN_NIL);
+    case 'o': return match_token_type(1, "r", TOKEN_OR);
+    case 'p': return match_token_type(4, "rint", TOKEN_PRINT);
+    case 'r': return match_token_type(5, "eturn", TOKEN_RETURN);
+    case 's': return match_token_type(4, "uper", TOKEN_SUPER);
+    case 'v': return match_token_type(2, "ar", TOKEN_VAR);
+    case 'w': return match_token_type(4, "hile", TOKEN_WHILE);
   }
 
   return TOKEN_IDENTIFIER;

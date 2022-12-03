@@ -120,15 +120,8 @@ static Token make_number_token(){
   return make_token(TOKEN_NUMBER);
 }
 
-
-// [a n d]
-// [0 1 2]
-//        curr/3
-
 static TokenType match_token_type(const int start_offset, const int length_of_rest, char *rest, TokenType type){
-
   long calc_length = scanner.current - (scanner.start + start_offset);
-
   if (calc_length == length_of_rest
       && memcmp(scanner.start + start_offset, rest, length_of_rest) == 0) {
     return type;
@@ -138,9 +131,8 @@ static TokenType match_token_type(const int start_offset, const int length_of_re
 }
 
 static TokenType get_token_type(){
-
+  
   char start_char = *scanner.start;
-  //init_scanner("and class else if nil or print return super var while false for fun this true");
 
   switch(start_char){
     case 'a': return match_token_type(1, 2, "nd", TOKEN_AND);
@@ -155,15 +147,19 @@ static TokenType get_token_type(){
     case 'v': return match_token_type(1, 2, "ar", TOKEN_VAR);
     case 'w': return match_token_type(1, 4, "hile", TOKEN_WHILE);
     case 'f': 
-              switch (*scanner.start + 1){
-                case 'a': return match_token_type(2, 3, "lse", TOKEN_FALSE);
-                case 'o': return match_token_type(2, 1, "r", TOKEN_FOR);
-                case 'u': return match_token_type(2, 1, "n", TOKEN_FUN);
+              if (scanner.current - scanner.start > 1){
+                switch (scanner.start[1]){
+                  case 'a': return match_token_type(2, 3, "lse", TOKEN_FALSE);
+                  case 'o': return match_token_type(2, 1, "r", TOKEN_FOR);
+                  case 'u': return match_token_type(2, 1, "n", TOKEN_FUN);
+                }
               }
     case 't':
-              switch (*scanner.start + 1){
-                case 'h': return match_token_type(2, 2, "is", TOKEN_THIS);
-                case 'r': return match_token_type(2, 2, "ue", TOKEN_TRUE);
+              if (scanner.current - scanner.start > 1){
+                switch (scanner.start[1]){
+                  case 'h': return match_token_type(2, 2, "is", TOKEN_THIS);
+                  case 'r': return match_token_type(2, 2, "ue", TOKEN_TRUE);
+                }
               }
   }
 

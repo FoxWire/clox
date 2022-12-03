@@ -249,7 +249,7 @@ char *single_branch_keywords_are_scanned(){
 
 char *multiple_branch_keywords_are_scanned(){
 
-  init_scanner("while false for fun this true");
+  init_scanner("false for fun this true");
 
   Token token = scan_token();
   mu_assert(token.type == TOKEN_FALSE, "expecting false");

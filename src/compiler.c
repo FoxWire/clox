@@ -14,6 +14,10 @@ typedef struct {
 
 Parser parser;
 
+Chunk *compiling_chunk;
+
+// Error handling //
+
 static void error_at(Token *token, const char *message){
 
   if (parser.panic_mode){
@@ -42,6 +46,8 @@ static void error_at_current(const char *message){
   error_at(&parser.current, message);
 }
 
+// Iterating through token stream //
+
 static void advance(){
   parser.previous = parser.current;
   while (true){
@@ -61,19 +67,45 @@ static void consume(TokenType token_type, const char *message){
   error_at_current(message);
 }
 
+// Emitting bytecode // 
 
+static Chunk* current_chunk(){
+  // this is just to help us change the code later
+  return compiling_chunk;
+}
 
+static void emit_byte(uint8_t byte){
+  writeChunk(current_chunk(), byte, parser.previous.line);
+}
 
+static void emit_bytes(uint8_t byte_a, uint8_t byte_b){
+  emit_byte(byte_a);
+  emit_byte(byte_b);
+}
+
+static void emit_return() {
+  emit_byte(OP_RETURN);
+
+}
+
+static void end_compiler() {
+  emit_return();
+}
+
+// Entry point // 
 
 bool compile(const char *source, Chunk *chunk){
   init_scanner(source);
 
+  compiling_chunk = chunk;
   parser.had_error = false;
   parser.panic_mode = false;
 
   advance();
   expression();
   consume(TOKEN_EOF, "Expect end of file expression");
+
+  end_compiler();
 
   return !parser.had_error;
 }

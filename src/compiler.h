@@ -5,4 +5,10 @@
 
 bool compile(const char *source, Chunk *chunk);
 
+void number();
+void unary();
+void grouping();
+void binary();
+
+
 #endif

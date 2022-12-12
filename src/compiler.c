@@ -4,6 +4,7 @@
 #include "common.h"
 #include "compiler.h"
 #include "scanner.h"
+#include "parse_rules.h"
 
 typedef struct {
   Token current;
@@ -92,6 +93,37 @@ static void end_compiler() {
   emit_return();
 }
 
+void number(){
+
+}
+
+void grouping(){
+
+}
+
+void unary(){
+
+}
+
+void binary(){
+
+}
+
+void parse(){
+  advance();
+  Token next_token = parser.previous;
+  // print_token_type(next_token.type);
+  ParseRule *rule = get_rule(next_token.type);
+  ParseFn prefix = rule->prefix;
+
+  if (prefix == NULL){
+    // syntax error
+  }
+
+  prefix();
+}
+
+
 // Entry point // 
 
 bool compile(const char *source, Chunk *chunk){
@@ -102,7 +134,8 @@ bool compile(const char *source, Chunk *chunk){
   parser.panic_mode = false;
 
   advance();
-  expression();
+  // expression();
+  parse();
   consume(TOKEN_EOF, "Expect end of file expression");
 
   end_compiler();

@@ -93,8 +93,11 @@ static void end_compiler() {
   emit_return();
 }
 
-void number(){
+void number(Token token){
+  double value = strtod(token.start, NULL);
 
+  emit_byte(OP_CONSTANT);
+  emit_byte(addConstant(compiling_chunk, value));
 }
 
 void grouping(){
@@ -120,7 +123,7 @@ void parse(){
     // syntax error
   }
 
-  prefix();
+  prefix(next_token);
 }
 
 

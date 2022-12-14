@@ -19,8 +19,8 @@ char *test_compile_number_literals(){
 
   mu_assert(success == true, "should compile without error");
 
-  //mu_assert(chunk.code[0] == OP_CONSTANT, "should have emitted OP_CONSTANT");
-  //Value value = chunk.constants.values[chunk.code[1]];
+  mu_assert(chunk.code[0] == OP_CONSTANT, "should have emitted OP_CONSTANT");
+  // Value value = chunk.constants.values[chunk.code[1]];
 
   //mu_assert(value == 2.0, "should put value in value table");
 

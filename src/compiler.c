@@ -76,7 +76,7 @@ static Chunk* current_chunk(){
 }
 
 static void emit_byte(uint8_t byte){
-  writeChunk(current_chunk(), byte, parser.previous.line);
+  Chunk_write(current_chunk(), byte, parser.previous.line);
 }
 
 static void emit_bytes(uint8_t byte_a, uint8_t byte_b){
@@ -97,7 +97,7 @@ void number(Token token){
   double value = strtod(token.start, NULL);
 
   emit_byte(OP_CONSTANT);
-  emit_byte(addConstant(compiling_chunk, value));
+  emit_byte(Chunk_add_constant(compiling_chunk, value));
 }
 
 void grouping(){

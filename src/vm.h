@@ -21,10 +21,10 @@ typedef enum {
 }InterpretResult;
 
 
-void initVM();
-void freeVM();
-InterpretResult interpret(const char *source);
-void push(Value value);
-Value pop();
+void VM_init();
+void VM_free();
+InterpretResult VM_interpret(const char *source);
+void VM_push(Value value);
+Value VM_pop();
 
 #endif

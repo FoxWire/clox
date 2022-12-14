@@ -11,7 +11,7 @@
 char *test_compile_number_literals(){
 
   Chunk chunk;
-  initChunk(&chunk);
+  Chunk_init(&chunk);
 
   char *source = "2.0";
 

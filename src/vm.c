@@ -10,7 +10,7 @@ static void resetStack(){
   vm.stackTop = vm.stack;
 }
 
-void initVM(){
+void VM_init(){
   resetStack();
 }
 
@@ -20,9 +20,9 @@ static InterpretResult run(){
 
 #define BINARY_OP(op) \
   do {\
-    double b = pop();\
-    double a = pop();\
-    push(a op b);\
+    double b = VM_pop();\
+    double a = VM_pop();\
+    VM_push(a op b);\
   } while(false) // do/while is just a hack to make a block in the macro syntax
 
   for (;;){
@@ -30,7 +30,7 @@ static InterpretResult run(){
     printf("     ");
     for (Value *slot = vm.stack; slot < vm.stackTop; slot++){
       printf("[ ");
-      printValue(*slot);
+      ValueArray_print_value(*slot);
       printf(" ]");
     }
     printf("\n");
@@ -41,16 +41,16 @@ static InterpretResult run(){
     switch (instruction = READ_BYTE()){
       case OP_CONSTANT: {
           Value constant = READ_CONSTANT();
-          push(constant);
+          VM_push(constant);
           break;
         }
       case OP_RETURN: {
-         printValue(pop());
+         ValueArray_print_value(VM_pop());
          printf("\n");
          return INTERPRET_OK;
         }
       case OP_NEGATE: {
-          push(-pop());
+          VM_push(-VM_pop());
           break;
         }
       case OP_ADD: BINARY_OP(+); break;
@@ -65,12 +65,12 @@ static InterpretResult run(){
 #undef BINARY_OP 
 }
 
-InterpretResult interpret(const char *source){
+InterpretResult VM_interpret(const char *source){
   Chunk chunk; 
-  initChunk(&chunk);
+  Chunk_init(&chunk);
 
   if (!compile(source, &chunk)){
-    freeChunk(&chunk);
+    Chunk_free(&chunk);
     return INTERPRET_COMPILE_ERROR;
   }
 
@@ -78,21 +78,21 @@ InterpretResult interpret(const char *source){
 
   vm.ip = vm.chunk->code;
   InterpretResult result = run();
-  freeChunk(&chunk);
+  Chunk_free(&chunk);
   return result;
 }
 
-void push(Value value){
+void VM_push(Value value){
   *vm.stackTop = value;
   vm.stackTop++;
 }
 
-Value pop(){
+Value VM_pop(){
   vm.stackTop--;
   return *vm.stackTop;
 }
 
-void freeVM(){
+void VM_free(){
 
 }
 

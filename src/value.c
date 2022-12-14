@@ -3,13 +3,13 @@
 #include "memory.h"
 #include "value.h"
 
-void initValueArray(ValueArray *array){
+void ValueArray_init(ValueArray *array){
   array->capacity = 0;
   array->count = 0;
   array->values = NULL;
 }
 
-void writeValueArray(ValueArray *array, Value value){
+void ValueArray_write_value(ValueArray *array, Value value){
   if (array->capacity < array->count + 1){
     int old_capacity = array->capacity;
     array->capacity = GROW_CAPACITY(old_capacity);
@@ -20,11 +20,11 @@ void writeValueArray(ValueArray *array, Value value){
   array->count++;
 }
 
-void freeValueArray(ValueArray *array){
+void ValueArray_free(ValueArray *array){
   FREE_ARRAY(Value, array->values, array->capacity);
-  initValueArray(array);
+  ValueArray_init(array);
 }
 
-void printValue(Value value){
+void ValueArray_print_value(Value value){
   printf("%g", value);
 }

@@ -51,6 +51,7 @@ static void error_at_current(const char *message){
 
 static void advance(){
   parser.previous = parser.current;
+
   while (true){
     parser.current = scan_token();
     if (parser.current.type != TOKEN_ERROR){
@@ -93,12 +94,34 @@ static void end_compiler() {
   emit_return();
 }
 
+// Parsing //
+
+void parse(){
+  ParseRule *rule = get_rule(parser.current.type);
+  ParseFn prefix = rule->prefix;
+
+  if (prefix == NULL){
+    // syntax error
+    printf("!! syntax error !!\n");
+  }
+  prefix(parser.current);
+
+  advance();
+
+  if (parser.current.type != TOKEN_EOF){
+    ParseRule *rule = get_rule(parser.current.type);
+    ParseFn infix = rule->infix;
+    infix(parser.current.type);
+  }
+}
+
 void number(Token token){
   double value = strtod(token.start, NULL);
 
   emit_byte(OP_CONSTANT);
   emit_byte(Chunk_add_constant(compiling_chunk, value));
 }
+
 
 void grouping(){
 
@@ -108,24 +131,25 @@ void unary(){
 
 }
 
-void binary(){
-
-}
-
-void parse(){
+void binary(TokenType type){
   advance();
-  Token next_token = parser.previous;
-  // print_token_type(next_token.type);
-  ParseRule *rule = get_rule(next_token.type);
-  ParseFn prefix = rule->prefix;
-
-  if (prefix == NULL){
-    // syntax error
+  parse();
+  switch(type){
+    case TOKEN_PLUS: 
+      emit_byte(OP_ADD);
+      break;
+    case TOKEN_MINUS: 
+      emit_byte(OP_SUBTRACT);
+      break;
+    case TOKEN_STAR: 
+      emit_byte(OP_MULTIPLY);
+      break;
+    case TOKEN_SLASH: 
+      emit_byte(OP_DIVIDE);
+      break;
+    default: emit_return(); // todo syntax error?
   }
-
-  prefix(next_token);
 }
-
 
 // Entry point // 
 

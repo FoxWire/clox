@@ -4,6 +4,17 @@
 #include "chunk.h"
 #include "memory.h"
 
+
+const char *OpCode_names[7] = {
+  "OP_RETURN",
+  "OP_CONSTANT",
+  "OP_NEGATE",
+  "OP_ADD",
+  "OP_SUBTRACT",
+  "OP_MULTIPLY",
+  "OP_DIVIDE",
+};
+
 void Chunk_init(Chunk *chunk){
   chunk->capacity = 0;
   chunk->count = 0;
@@ -37,9 +48,21 @@ void Chunk_free(Chunk *chunk){
   Chunk_init(chunk);
 }
 
-int addition(int a, int b){
-  return a + b;
+void Chunk_print(Chunk *chunk){
+
+  for (int i = 0; i < chunk->count; i++){
+    uint8_t current = chunk->code[i];
+    const char *op_code = OpCode_names[current];
+    printf("[%s], ", op_code);
+    if (current == OP_CONSTANT){
+      printf("[%.1f] ", chunk->constants.values[chunk->code[i + 1]]);
+      i++;
+    }
+  }
+  printf("\n");
+
 }
+
 
 
 

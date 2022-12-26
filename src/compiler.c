@@ -106,35 +106,45 @@ void parse(){
   }
   prefix(parser.current);
 
-  advance();
+  if (parser.current.type != TOKEN_EOF && parser.current.type != TOKEN_RIGHT_PAREN){
 
-  if (parser.current.type != TOKEN_EOF){
     ParseRule *rule = get_rule(parser.current.type);
     ParseFn infix = rule->infix;
-    infix(parser.current.type);
+    infix(parser.current);
   }
 }
 
+/*
+ * Upon returning, each parse function must
+ * ensure that all of its tokens are consumed.
+ */
 void number(Token token){
   double value = strtod(token.start, NULL);
 
   emit_byte(OP_CONSTANT);
   emit_byte(Chunk_add_constant(compiling_chunk, value));
-}
-
-
-void grouping(){
-
-}
-
-void unary(){
-
-}
-
-void binary(TokenType type){
   advance();
+}
+
+void grouping(Token token){
+  consume(TOKEN_LEFT_PAREN, "Expecting left paren");
   parse();
-  switch(type){
+  consume(TOKEN_RIGHT_PAREN, "Expecting right paren");
+}
+
+void unary(Token token){
+  // NOTE: remember this could also be a bang
+  consume(TOKEN_MINUS, "Expecting minus");
+  parse();
+  emit_byte(OP_NEGATE);
+  advance();
+}
+
+void binary(Token token){
+  advance();
+
+  parse();
+  switch(token.type){
     case TOKEN_PLUS: 
       emit_byte(OP_ADD);
       break;

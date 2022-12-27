@@ -164,6 +164,44 @@ char *test_compile_expression_with_negation() {
   return NULL;
 }
 
+char *test_compile_with_precedence(){
+  Chunk chunk;
+  Chunk_init(&chunk);
+
+  char *source = "5 + 2 * 3";
+
+  bool success = compile(source, &chunk);
+  mu_assert(success == true, "should compile without error");
+
+  // 5
+  mu_assert(chunk.code[0] == OP_CONSTANT, "should have emitted OP_CONSTANT");
+  Value first_value = chunk.constants.values[chunk.code[1]];
+  mu_assert(first_value == 5, "should put value in value table");
+
+  // 2
+  mu_assert(chunk.code[2] == OP_CONSTANT, "should have emitted OP_CONSTANT");
+  Value second_value = chunk.constants.values[chunk.code[3]];
+  mu_assert(second_value == 2, "should put value in value table");
+
+  // 3
+  mu_assert(chunk.code[4] == OP_CONSTANT, "should have emitted OP_CONSTANT");
+  Value third_value = chunk.constants.values[chunk.code[5]];
+  mu_assert(third_value == 3, "should put value in value table");
+
+  // *
+  mu_assert(chunk.code[6] == OP_MULTIPLY, "expecting OP_MULTIPLY");
+  
+  // +
+  mu_assert(chunk.code[7] == OP_ADD, "expecting OP_ADD");
+  
+  mu_assert(chunk.code[8] == OP_RETURN, "should end with return");
+  mu_assert(chunk.count == 9, "should be 9 bytes");
+
+  Chunk_free(&chunk);
+  return NULL;
+
+}
+
 char *all_tests() {
 
   mu_suite_start();
@@ -172,6 +210,7 @@ char *all_tests() {
   mu_run_test(test_compile_binary_expression_with_associativity);
   mu_run_test(test_compile_expression_grouping_with_parens);
   mu_run_test(test_compile_expression_with_negation);
+  mu_run_test(test_compile_with_precedence);
 
   return NULL;
 }

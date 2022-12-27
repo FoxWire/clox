@@ -87,7 +87,6 @@ static void emit_bytes(uint8_t byte_a, uint8_t byte_b){
 
 static void emit_return() {
   emit_byte(OP_RETURN);
-
 }
 
 static void end_compiler() {
@@ -96,7 +95,7 @@ static void end_compiler() {
 
 // Parsing //
 
-void parse(){
+void parse(Precedence precedence){
   ParseRule *rule = get_rule(parser.current.type);
   ParseFn prefix = rule->prefix;
 
@@ -106,7 +105,12 @@ void parse(){
   }
   prefix(parser.current);
 
-  if (parser.current.type != TOKEN_EOF && parser.current.type != TOKEN_RIGHT_PAREN){
+  // at this point you have advanced
+  rule = get_rule(parser.current.type);
+
+  if (parser.current.type != TOKEN_EOF 
+      && precedence <= rule->precedence
+      && parser.current.type != TOKEN_RIGHT_PAREN){
 
     ParseRule *rule = get_rule(parser.current.type);
     ParseFn infix = rule->infix;
@@ -128,35 +132,33 @@ void number(Token token){
 
 void grouping(Token token){
   consume(TOKEN_LEFT_PAREN, "Expecting left paren");
-  parse();
+  parse(PREC_NONE);
   consume(TOKEN_RIGHT_PAREN, "Expecting right paren");
 }
 
 void unary(Token token){
   // NOTE: remember this could also be a bang
   consume(TOKEN_MINUS, "Expecting minus");
-  parse();
+  parse(PREC_UNARY);
   emit_byte(OP_NEGATE);
   advance();
 }
 
+// 5 + 2 * 3
+
 void binary(Token token){
+
+  ParseRule *rule = get_rule(token.type);
+  Precedence prec = rule->precedence;
+
   advance();
 
-  parse();
+  parse(prec);
   switch(token.type){
-    case TOKEN_PLUS: 
-      emit_byte(OP_ADD);
-      break;
-    case TOKEN_MINUS: 
-      emit_byte(OP_SUBTRACT);
-      break;
-    case TOKEN_STAR: 
-      emit_byte(OP_MULTIPLY);
-      break;
-    case TOKEN_SLASH: 
-      emit_byte(OP_DIVIDE);
-      break;
+    case TOKEN_PLUS: emit_byte(OP_ADD); break;
+    case TOKEN_MINUS: emit_byte(OP_SUBTRACT); break;
+    case TOKEN_STAR: emit_byte(OP_MULTIPLY); break;
+    case TOKEN_SLASH: emit_byte(OP_DIVIDE); break;
     default: emit_return(); // todo syntax error?
   }
 }
@@ -171,8 +173,7 @@ bool compile(const char *source, Chunk *chunk){
   parser.panic_mode = false;
 
   advance();
-  // expression();
-  parse();
+  parse(PREC_NONE);
   consume(TOKEN_EOF, "Expect end of file expression");
 
   end_compiler();

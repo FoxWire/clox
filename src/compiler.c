@@ -95,21 +95,19 @@ static void end_compiler() {
 
 // Parsing //
 
-void parse(Precedence precedence){
-  ParseRule *rule = get_rule(parser.current.type);
-  ParseFn prefix = rule->prefix;
+void parse(Precedence current_precedence){
+  ParseFn prefix = get_rule(parser.current.type)->prefix;
 
   if (prefix == NULL){
-    // syntax error
     printf("!! syntax error !!\n");
   }
   prefix(parser.current);
 
   // at this point you have advanced
-  rule = get_rule(parser.current.type);
+  Precedence prev_precedence = get_rule(parser.current.type)->precedence;
 
-  if (parser.current.type != TOKEN_EOF 
-      && precedence <= rule->precedence
+  while (parser.current.type != TOKEN_EOF 
+      && current_precedence <= prev_precedence
       && parser.current.type != TOKEN_RIGHT_PAREN){
 
     ParseRule *rule = get_rule(parser.current.type);
@@ -144,7 +142,7 @@ void unary(Token token){
   advance();
 }
 
-// 5 + 2 * 3
+// 5 + 2 * 3 + 1
 
 void binary(Token token){
 

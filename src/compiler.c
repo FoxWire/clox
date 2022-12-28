@@ -95,7 +95,7 @@ static void end_compiler() {
 
 // Parsing //
 
-void parse(Precedence current_precedence){
+void parse(Precedence prev_precedence){
   ParseFn prefix = get_rule(parser.current.type)->prefix;
 
   if (prefix == NULL){
@@ -104,10 +104,10 @@ void parse(Precedence current_precedence){
   prefix(parser.current);
 
   // at this point you have advanced
-  Precedence prev_precedence = get_rule(parser.current.type)->precedence;
+  Precedence current_precedence = get_rule(parser.current.type)->precedence;
 
   while (parser.current.type != TOKEN_EOF 
-      && current_precedence <= prev_precedence
+      && prev_precedence <= current_precedence
       && parser.current.type != TOKEN_RIGHT_PAREN){
 
     ParseRule *rule = get_rule(parser.current.type);
@@ -142,8 +142,6 @@ void unary(Token token){
   advance();
 }
 
-// 5 + 2 * 3 + 1
-
 void binary(Token token){
 
   ParseRule *rule = get_rule(token.type);
@@ -151,7 +149,7 @@ void binary(Token token){
 
   advance();
 
-  parse(prec);
+  parse((Precedence) prec + 1);
   switch(token.type){
     case TOKEN_PLUS: emit_byte(OP_ADD); break;
     case TOKEN_MINUS: emit_byte(OP_SUBTRACT); break;
